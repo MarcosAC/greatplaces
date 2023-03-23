@@ -1,6 +1,6 @@
 # greatplaces
 
-A new Flutter project.
+App do curso de Flutter utilizando recursos nativos, como: Camera, maspa e BD Sqlite.
 
 ## Getting Started
 
