@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 
 import '../models/place.dart';
+import '../utils/db_util.dart';
 
 class GreatPlaces with ChangeNotifier {
   List<Place> _items = [];
@@ -11,8 +12,15 @@ class GreatPlaces with ChangeNotifier {
   Future<void> loadPlaces() async {
     final dataList = await DbUtil.getData('places');
 
-    _items = dataList.map((item) => Place(id: item['id'], title: title['title'], location: location: null, image: File(item['image']),)).toList();
-    
+    _items = dataList
+        .map((item) => Place(
+              id: item['id'],
+              title: item['title'],
+              location: null,
+              image: File(item['image']),
+            ))
+        .toList();
+
     notifyListeners();
   }
 
@@ -29,14 +37,21 @@ class GreatPlaces with ChangeNotifier {
   }
 
   void addPlace(String title, File image) {
-    final newPlace = Place(id: Random().nextDouble().toString(), title: title, location: null, image: image,);
-    
+    final newPlace = Place(
+      id: Random().nextDouble().toString(),
+      title: title,
+      location: null,
+      image: image,
+    );
+
     _items.add(newPlace);
 
-    DbUtil.insert('places', {'id': newPlace.id, 'title': newPlace.title, 'image': newPlace.image.path,});
+    DbUtil.insert('places', {
+      'id': newPlace.id,
+      'title': newPlace.title,
+      'image': newPlace.image.path,
+    });
 
     notifyListeners();
   }
-
-  
 }
