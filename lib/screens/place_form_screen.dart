@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:greatplaces/providers/great_places_provider.dart';
 import 'package:greatplaces/widgets/image_input.dart';
 import 'package:greatplaces/widgets/location_input.dart';
@@ -16,16 +17,31 @@ class PlaceFormScreen extends StatefulWidget {
 class _PlaceFormScreenState extends State<PlaceFormScreen> {
   final _titleController = TextEditingController();
   File? _pickedImage;
+  LatLng? _pickedPositions;
 
   void _selectImage(File pickedImage) {
-    _pickedImage = pickedImage;
+    setState(() {
+      _pickedImage = pickedImage;
+    });
+  }
+
+  void _selectPosition(LatLng position) {
+    setState(() {
+      _pickedPositions = position;
+    });
+  }
+
+  bool _isValidForm() {
+    return _titleController.text.isNotEmpty &&
+        _pickedImage != null &&
+        _pickedPositions != null;
   }
 
   void _submitForm() {
     if (_titleController.text.isEmpty || _pickedImage == null) return;
 
     Provider.of<GreatPlaces>(context, listen: false)
-        .addPlace(_titleController.text, _pickedImage!);
+        .addPlace(_titleController.text, _pickedImage!, _pickedPositions!);
 
     Navigator.of(context).pop();
   }
@@ -50,11 +66,14 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
                       decoration: const InputDecoration(
                         labelText: 'Título',
                       ),
+                      onChanged: (text) {
+                        setState(() {});
+                      },
                     ),
                     const SizedBox(height: 10),
                     ImageInput(_selectImage),
                     const SizedBox(height: 10),
-                    const LocationInput(),
+                    LocationInput(_selectPosition),
                   ],
                 ),
               ),
@@ -69,7 +88,7 @@ class _PlaceFormScreenState extends State<PlaceFormScreen> {
               elevation: 0,
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
-            onPressed: _submitForm,
+            onPressed: _isValidForm() ? _submitForm : null,
           ),
         ],
       ),
